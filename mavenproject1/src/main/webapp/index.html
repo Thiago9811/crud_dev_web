@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Biblioteca - Início</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style>
+            body { font-family: sans-serif; text-align: center; padding: 20px; }
+            .menu-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+            .menu-box { border: 1px solid #ccc; padding: 20px; border-radius: 8px; width: 250px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+            h3 { margin-top: 0; color: #333; }
+            button { width: 100%; padding: 10px; margin-bottom: 10px; cursor: pointer; border: none; border-radius: 4px; color: white; font-weight: bold;}
+            .btn-blue { background-color: #007bff; }
+            .btn-green { background-color: #28a745; }
+            .btn-orange { background-color: #fd7e14; }
+        </style>
+    </head>
+    <body>
+        <h1>Sistema de Gerenciamento de Biblioteca</h1>
+
+        <div class="menu-container">
+            
+            <div class="menu-box">
+                <h3>Usuários</h3>
+                <form action="CadastroUsuario" method="get">
+                    <button type="submit" class="btn-blue">Cadastrar Novo Usuário</button>
+                </form>
+                <form action="UsuariosServlet" method="get">
+                    <button type="submit" class="btn-green">Ver Lista de Usuários</button>
+                </form>
+            </div>
+
+            <div class="menu-box">
+                <h3>Livros</h3>
+                <form action="CadastroLivroController" method="get">
+                    <button type="submit" class="btn-blue">Cadastrar Novo Livro</button>
+                </form>
+                </div>
+
+            <div class="menu-box" style="background-color: #f8f9fa;">
+                <h3>Empréstimos</h3>
+                <form action="EmprestimoController" method="get">
+                    <button type="submit" class="btn-orange">Gerenciar Empréstimos</button>
+                </form>
+            </div>
+            
+        </div>
+    </body>
+</html>

@@ -1,0 +1,36 @@
+Sun Nov 23 15:27:17 BRT 2025 : Apache Derby Servidor de Rede - 10.17.1.0 - (1913217) iniciado e pronto para aceitar conexões na porta 1527 em {3}
+----------------------------------------------------------------
+Sun Nov 23 15:27:18 BRT 2025:
+ Inicializando o Derby versão The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instância a816c00e-019a-b1f8-661f-ffffebbf390e
+no diretório de banco de dados C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\Biblioteca 
+
+java.vendor=Oracle Corporation
+java.runtime.version=22.0.1+8-16
+user.dir=C:\Users\Thiago\GlassFish_Server\javadb
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web
+Carregador de classe do banco de dados iniciado - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Nov 23 15:27:50 BRT 2025:
+ Inicializando o Derby versão The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instância a094c023-019a-b1f8-661f-ffffebbf390e
+no diretório de banco de dados C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\sun-appserv-samples 
+
+java.vendor=Oracle Corporation
+java.runtime.version=22.0.1+8-16
+user.dir=C:\Users\Thiago\GlassFish_Server\javadb
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web
+Carregador de classe do banco de dados iniciado - derby.database.classpath=''
+----------------------------------------------------------------
+Sun Nov 23 16:14:57 BRT 2025: Shutting down Derby engine
+----------------------------------------------------------------
+Sun Nov 23 16:14:57 BRT 2025:
+Encerrando a instância a094c023-019a-b1f8-661f-ffffebbf390e
+----------------------------------------------------------------
+Sun Nov 23 16:14:57 BRT 2025:
+Encerrando a instância a816c00e-019a-b1f8-661f-ffffebbf390e
+----------------------------------------------------------------

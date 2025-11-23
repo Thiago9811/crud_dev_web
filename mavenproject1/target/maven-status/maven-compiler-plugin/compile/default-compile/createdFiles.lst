@@ -1,0 +1,13 @@
+com\mycompany\mavenproject1\MostrarUsuarios.class
+com\mycompany\mavenproject1\acesso\UsuarioAcesso.class
+com\mycompany\mavenproject1\acesso\EmprestimoAcesso.class
+com\mycompany\mavenproject1\acesso\LivroAcesso.class
+com\mycompany\mavenproject1\controller\UsuariosServlet.class
+com\mycompany\mavenproject1\resources\JakartaEE11Resource.class
+com\mycompany\mavenproject1\model\Usuario.class
+com\mycompany\mavenproject1\model\Livro.class
+com\mycompany\mavenproject1\JakartaRestConfiguration.class
+com\mycompany\mavenproject1\controller\EmprestimoController.class
+com\mycompany\mavenproject1\CadastroUsuario.class
+com\mycompany\mavenproject1\controller\CadastroLivroController.class
+com\mycompany\mavenproject1\model\Emprestimo.class
