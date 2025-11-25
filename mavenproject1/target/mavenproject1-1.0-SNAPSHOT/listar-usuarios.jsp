@@ -37,6 +37,14 @@
                     <td>${u.email}</td>
                     <td>${u.telefone}</td>
                     <td>${u.cpf}</td>
+                    <td>
+                        <a href="EditarUsuario?id=${u.usuarioId}">Editar</a>
+                        &nbsp;|&nbsp;
+                        <a href="ExcluirUsuario?id=${u.usuarioId}" 
+                           onclick="return confirm('Tem certeza que deseja excluir?');">
+                            Excluir
+                        </a>
+                    </td>
                 </tr>
             </c:forEach>
         </table>

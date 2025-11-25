@@ -49,6 +49,66 @@ public class UsuarioAcesso {
         }
         return lista;
     }
-    
-    // ... seu método de salvar/cadastrar também fica aqui ...
+    public void excluir(int id) {
+        String sql = "DELETE FROM usuarios WHERE usuarioid = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 2. MÉTODO ATUALIZAR
+    public void atualizar(Usuario u) {
+        String sql = "UPDATE usuarios SET nome=?, email=?, telefone=?, cpf=? WHERE usuarioid=?";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, u.getNome());
+            stmt.setString(2, u.getEmail());
+            stmt.setString(3, u.getTelefone());
+            stmt.setString(4, u.getCpf());
+            // Adicione getTipoUsuario() na sua classe Usuario se ainda não tiver
+            // Se não tiver, remova essa linha ou use um valor fixo por enquanto
+            //stmt.setString(5, "LEITOR"); 
+            
+            stmt.setInt(5, u.getUsuarioId());
+            
+            stmt.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 3. MÉTODO BUSCAR POR ID (Para preencher o formulário de edição)
+    public Usuario buscarPorId(int id) {
+        String sql = "SELECT * FROM usuarios WHERE usuarioid = ?";
+        Usuario u = null;
+        
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                u = new Usuario();
+                u.setUsuarioId(rs.getInt("usuarioid"));
+                u.setNome(rs.getString("nome"));
+                u.setEmail(rs.getString("email"));
+                u.setTelefone(rs.getString("telefone"));
+                u.setCpf(rs.getString("cpf"));
+                // u.setTipoUsuario(rs.getString("tipousuario"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return u;
+    }
 }
+    // ... seu método de salvar/cadastrar também fica aqui ...
