@@ -1,18 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject1.controller;
-
-/**
- *
- * @author Thiago
- */
 
 import com.mycompany.mavenproject1.acesso.LivroAcesso;
 import com.mycompany.mavenproject1.model.Livro;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -22,38 +12,15 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/CadastroLivroController")
 public class CadastroLivroController extends HttpServlet {
 
-    // --- 1. MOSTRAR O FORMULÁRIO (VIEW) ---
+    // --- 1. MOSTRAR O FORMULÁRIO (AGORA USANDO JSP) ---
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html><head><title>Cadastrar Livro</title>");
-            out.println("<style>body{font-family:sans-serif; max-width:600px; margin:20px auto;} label{display:block; margin-top:10px;} input{width:100%; padding:5px;} button{margin-top:20px; padding:10px; width:100%; background-color:blue; color:white; cursor:pointer;}</style>");
-            out.println("</head><body>");
-            
-            out.println("<h1>Novo Livro</h1>");
-            out.println("<form action='CadastroLivroController' method='post'>");
-            
-            out.println("<label>Título:</label> <input type='text' name='titulo' required>");
-            out.println("<label>Autor:</label> <input type='text' name='autor' required>");
-            out.println("<label>Editora:</label> <input type='text' name='editora'>");
-            out.println("<label>Ano Publicação:</label> <input type='number' name='ano' required>");
-            out.println("<label>ISBN:</label> <input type='text' name='isbn'>");
-            out.println("<label>Gênero:</label> <input type='text' name='genero'>");
-            out.println("<label>Quantidade Total:</label> <input type='number' name='qtd' value='1' required>");
-            
-            out.println("<button type='submit'>Salvar Livro</button>");
-            out.println("</form>");
-            
-            out.println("<br><a href='index.html'>Voltar ao Menu</a>");
-            out.println("</body></html>");
-        }
+        // Apenas abre a página visual que criamos acima
+        request.getRequestDispatcher("cadastro-livro.jsp").forward(request, response);
     }
 
-    // --- 2. RECEBER DADOS E SALVAR (CONTROLLER) ---
+    // --- 2. RECEBER DADOS E SALVAR ---
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -64,27 +31,30 @@ public class CadastroLivroController extends HttpServlet {
             l.setTitulo(request.getParameter("titulo"));
             l.setAutor(request.getParameter("autor"));
             l.setEditora(request.getParameter("editora"));
-            l.setAnoPublicacao(Integer.parseInt(request.getParameter("ano")));
+            
+            // Conversão segura para inteiros (evita erro se vier vazio)
+            String anoStr = request.getParameter("ano");
+            l.setAnoPublicacao(anoStr != null && !anoStr.isEmpty() ? Integer.parseInt(anoStr) : 0);
+            
             l.setIsbn(request.getParameter("isbn"));
             l.setGenero(request.getParameter("genero"));
-            l.setQuantidadeTotal(Integer.parseInt(request.getParameter("qtd")));
+            
+            String qtdStr = request.getParameter("qtd");
+            l.setQuantidadeTotal(qtdStr != null && !qtdStr.isEmpty() ? Integer.parseInt(qtdStr) : 1);
             
             // B. Chamar o DAO
             LivroAcesso acesso = new LivroAcesso();
-            acesso.cadastrar(l);
+            acesso.cadastrar(l); // Certifique-se que LivroAcesso tem o método 'cadastrar'
             
-            // C. Feedback
-            response.setContentType("text/html;charset=UTF-8");
-            try (PrintWriter out = response.getWriter()) {
-                out.println("<h1>Livro Cadastrado com Sucesso!</h1>");
-                out.println("<p>" + l.getTitulo() + "</p>");
-                out.println("<a href='CadastroLivroController'>Cadastrar Outro</a><br><br>");
-                out.println("<a href='index.html'>Voltar ao Menu</a>");
-            }
+            // C. Redirecionar para a lista (Feedback Visual)
+            // Em vez de imprimir HTML de sucesso aqui, mandamos o usuário de volta para a lista
+            // E podemos adicionar um parâmetro na URL para mostrar uma mensagem lá
+            response.sendRedirect("ListarLivros"); // Redireciona para o Servlet de listagem
             
         } catch (Exception e) {
-            response.getWriter().println("Erro ao salvar: " + e.getMessage());
             e.printStackTrace();
+            // Em caso de erro, fica na mesma página ou mostra erro
+            response.getWriter().println("Erro crítico: " + e.getMessage());
         }
     }
 }

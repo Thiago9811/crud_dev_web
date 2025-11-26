@@ -37,7 +37,7 @@ public class EmprestimoAcesso {
 
             // B. Inserir Empréstimo (Data Prevista = Hoje + 7 dias)
             String sqlInsert = "INSERT INTO emprestimos (usuarioid, livroid, dataemprestimo, datadevolucaoprevista, statusemprestimo) "
-                             + "VALUES (?, ?, CURRENT_DATE, ?, 'ATIVO')";
+                             + "VALUES (?, ?, CURRENT_DATE, ?, 'ativo')";
             
             PreparedStatement stmt = conn.prepareStatement(sqlInsert);
             stmt.setInt(1, usuarioId);
@@ -79,7 +79,7 @@ public class EmprestimoAcesso {
                 Date dataHoje = new Date(System.currentTimeMillis());
                 
                 // B. Atualizar Empréstimo (Fechar)
-                String sqlUpdate = "UPDATE emprestimos SET datadevolucaoreal = CURRENT_DATE, statusemprestimo = 'FINALIZADO' WHERE emprestimoid = ?";
+                String sqlUpdate = "UPDATE emprestimos SET datadevolucaoreal = CURRENT_DATE, statusemprestimo = 'devolvido' WHERE emprestimoid = ?";
                 PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate);
                 stmtUpdate.setInt(1, emprestimoId);
                 stmtUpdate.executeUpdate();
@@ -99,7 +99,7 @@ public class EmprestimoAcesso {
                     double valorMulta = diasAtraso * 2.50;
                     
                     String sqlMulta = "INSERT INTO penalidades (usuarioid, emprestimoid, tipopenalidade, descricao, valormulta, diasuspensao, statuspenalidade, datapenalidade) "
-                                    + "VALUES (?, ?, 'MULTA', ?, ?, 0, 'PENDENTE', CURRENT_DATE)";
+                                    + "VALUES (?, ?, 'multa', ?, ?, 0, 'pendente', CURRENT_DATE)";
                     
                     PreparedStatement stmtMulta = conn.prepareStatement(sqlMulta);
                     stmtMulta.setInt(1, usuarioId);
