@@ -1,6 +1,8 @@
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\acesso\EmprestimoAcesso.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\acesso\LivroAcesso.java
+C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\acesso\PenalidadeAcesso.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\acesso\UsuarioAcesso.java
+C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\BuscarUsuario.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\CadastroLivroController.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\CadastroUsuarioController.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\EditarLivroController.java
@@ -10,10 +12,12 @@ C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\sr
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\ExcluirUsuarioController.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\ListarLivrosController.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\LoginController.java
+C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\RelatorioController.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\controller\UsuariosServlet.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\JakartaRestConfiguration.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\model\Emprestimo.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\model\Livro.java
+C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\model\Penalidade.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\model\Usuario.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\resources\JakartaEE11Resource.java
 C:\Users\Thiago\Desktop\Trabalho Introdução a Dev Web\dev_web\mavenproject1\src\main\java\com\mycompany\mavenproject1\util\Seguranca.java

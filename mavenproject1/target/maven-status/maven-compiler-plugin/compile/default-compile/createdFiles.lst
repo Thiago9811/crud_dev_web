@@ -1,5 +1,7 @@
+com\mycompany\mavenproject1\controller\RelatorioController.class
 com\mycompany\mavenproject1\controller\EditarUsuarioController.class
 com\mycompany\mavenproject1\controller\ListarLivrosController.class
+com\mycompany\mavenproject1\model\Penalidade.class
 com\mycompany\mavenproject1\acesso\UsuarioAcesso.class
 com\mycompany\mavenproject1\controller\LoginController.class
 com\mycompany\mavenproject1\acesso\EmprestimoAcesso.class
@@ -9,11 +11,13 @@ com\mycompany\mavenproject1\resources\JakartaEE11Resource.class
 com\mycompany\mavenproject1\controller\CadastroUsuarioController.class
 com\mycompany\mavenproject1\model\Usuario.class
 com\mycompany\mavenproject1\util\Seguranca.class
+com\mycompany\mavenproject1\controller\BuscarUsuario.class
 com\mycompany\mavenproject1\controller\EditarLivroController.class
 com\mycompany\mavenproject1\controller\ExcluirLivroController.class
 com\mycompany\mavenproject1\model\Livro.class
 com\mycompany\mavenproject1\JakartaRestConfiguration.class
 com\mycompany\mavenproject1\controller\EmprestimoController.class
 com\mycompany\mavenproject1\controller\ExcluirUsuarioController.class
+com\mycompany\mavenproject1\acesso\PenalidadeAcesso.class
 com\mycompany\mavenproject1\controller\CadastroLivroController.class
 com\mycompany\mavenproject1\model\Emprestimo.class

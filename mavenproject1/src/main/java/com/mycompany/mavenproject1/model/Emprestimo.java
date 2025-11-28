@@ -16,7 +16,7 @@ public class Emprestimo {
     private String nomeUsuarioAux;
     private String tituloLivroAux;
 
-    // --- GETTERS E SETTERS (Gere via Alt+Insert no NetBeans) ---
+    // --- GETTERS E SETTERS ---
     public int getEmprestimoId() { return emprestimoId; }
     public void setEmprestimoId(int emprestimoId) { this.emprestimoId = emprestimoId; }
     public int getUsuarioId() { return usuarioId; }

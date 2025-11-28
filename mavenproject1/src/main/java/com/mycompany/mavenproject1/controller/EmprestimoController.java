@@ -9,62 +9,104 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/EmprestimoController")
 public class EmprestimoController extends HttpServlet {
 
-    // doPost: Usado para realizar AÇÕES (Emprestar / Devolver)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String acao = request.getParameter("acao");
-        EmprestimoAcesso dao = new EmprestimoAcesso();
-        String mensagem = "";
-        
-        try {
-            if ("emprestar".equals(acao)) {
-                int usuarioId = Integer.parseInt(request.getParameter("usuarioId"));
-                int livroId = Integer.parseInt(request.getParameter("livroId"));
-                
-                dao.registrarEmprestimo(usuarioId, livroId);
-                mensagem = "Empréstimo realizado com sucesso!";
-                
-            } else if ("devolver".equals(acao)) {
-                int emprestimoId = Integer.parseInt(request.getParameter("emprestimoId"));
-                
-                // O método devolve uma String avisando se teve multa
-                mensagem = dao.realizarDevolucao(emprestimoId);
-            }
-            
-        } catch (Exception e) {
-            mensagem = "Erro: " + e.getMessage();
-            e.printStackTrace();
-        }
-        
-        // Passa a mensagem para o JSP e recarrega a lista
-        request.setAttribute("msgSistema", mensagem);
-        doGet(request, response); 
+        processarAcao(request, response);
     }
 
-    // doGet: Usado para CARREGAR a página e a tabela
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String acao = request.getParameter("acao");
+        if (acao == null || acao.isEmpty() || "listar".equals(acao)) {
+            carregarListas(request, response);
+        } else {
+            processarAcao(request, response); 
+        }
+    }
+
+    private void processarAcao(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String acao = request.getParameter("acao");
+        EmprestimoAcesso dao = new EmprestimoAcesso();
+        HttpSession session = request.getSession(); 
         
         try {
-            EmprestimoAcesso dao = new EmprestimoAcesso();
-            // Busca a lista atualizada
+            if ("emprestar".equals(acao)) {
+                String nomeUsuario = request.getParameter("nomeUsuario");
+                String tituloLivro = request.getParameter("tituloLivro");
+
+                int usuarioId = dao.buscarIdUsuarioPorNome(nomeUsuario);
+                int livroId = dao.buscarIdLivroPorTitulo(tituloLivro);
+
+                if (usuarioId == -1) {
+                    throw new Exception("Usuário '" + nomeUsuario + "' não encontrado.");
+                }
+                if (livroId == -1) {
+                    throw new Exception("Livro '" + tituloLivro + "' não encontrado.");
+                }
+
+                dao.registrarEmprestimo(usuarioId, livroId);
+                
+                session.setAttribute("msgSistema", "Empréstimo registrado com sucesso para " + nomeUsuario + "!");
+                session.setAttribute("tipoMsg", "success");
+
+            } else if ("devolver".equals(acao)) {
+                int emprestimoId = Integer.parseInt(request.getParameter("emprestimoId"));
+                String resultado = dao.realizarDevolucao(emprestimoId);
+                
+                session.setAttribute("msgSistema", resultado);
+                if(resultado.contains("ATRASO")) {
+                    session.setAttribute("tipoMsg", "warning");
+                } else {
+                    session.setAttribute("tipoMsg", "success");
+                }
+            }
+
+        } catch (Exception e) {
+            session.setAttribute("msgSistema", "Erro: " + e.getMessage());
+            session.setAttribute("tipoMsg", "danger");
+            e.printStackTrace();
+        }
+
+        response.sendRedirect("EmprestimoController");
+    }
+
+    private void carregarListas(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        EmprestimoAcesso dao = new EmprestimoAcesso();
+        HttpSession session = request.getSession();
+        
+        if (session.getAttribute("msgSistema") != null) {
+            request.setAttribute("msgSistema", session.getAttribute("msgSistema"));
+            request.setAttribute("tipoMsg", session.getAttribute("tipoMsg"));
+            session.removeAttribute("msgSistema");
+            session.removeAttribute("tipoMsg");
+        }
+
+        try {
             List<Emprestimo> lista = dao.listarHistorico();
-            
-            // Coloca a lista na "mochila" (request) para o JSP ler
             request.setAttribute("listaEmprestimos", lista);
+
+            List<String> sugestaoUsuarios = dao.listarNomesUsuarios();
+            List<String> sugestaoLivros = dao.listarTitulosLivrosDisponiveis();
             
-            // Abre o JSP
+            request.setAttribute("sugestaoUsuarios", sugestaoUsuarios);
+            request.setAttribute("sugestaoLivros", sugestaoLivros);
+
             request.getRequestDispatcher("gerenciar-emprestimos.jsp").forward(request, response);
-            
         } catch (Exception e) {
             e.printStackTrace();
+            request.setAttribute("msgSistema", "Erro fatal ao carregar dados: " + e.getMessage());
+            request.getRequestDispatcher("gerenciar-emprestimos.jsp").forward(request, response);
         }
     }
 }

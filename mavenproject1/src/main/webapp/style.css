@@ -1,0 +1,236 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 28 de nov. de 2025, 01:44:54
+    Author     : Pedro
+*/
+
+/* --- VARIAVEIS GLOBAIS --- */
+:root {
+    --primary: #2c3e50;      /* Azul Petróleo */
+    --accent: #d4a574;       /* Tom "Areia/Madeira" da Index */
+    --accent-hover: #b88b5c;
+    --success: #27ae60;      /* Verde Sucesso */
+    --danger: #e74c3c;       /* Vermelho Erro */
+    --light-bg: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.96); /* Fundo branco com leve transparência */
+    --shadow: 0 8px 32px rgba(0,0,0,0.2);
+    --radius: 12px;
+}
+
+/* --- RESET & BODY --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* Mesma imagem da Index */
+    background: url("https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg") no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    min-height: 100vh;
+}
+
+/* --- NAVBAR (Barra Superior) --- */
+.navbar {
+    background: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #555;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: 0.3s;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+.user-tag {
+    background: var(--light-bg);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid #eee;
+}
+
+/* --- CONTAINER PRINCIPAL --- */
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: var(--glass-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(8px);
+}
+
+.container-small { max-width: 500px; } /* Para login/formulários pequenos */
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+    padding-bottom: 1rem;
+}
+
+.page-header h1 { margin: 0; color: var(--primary); font-size: 2rem; }
+.page-header p { color: #666; margin-top: 5px; }
+
+/* --- BOTÕES --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-accent { background-color: var(--accent); color: white; }
+.btn-accent:hover { background-color: var(--accent-hover); }
+.btn-success { background-color: var(--success); color: white; }
+.btn-danger { background-color: var(--danger); color: white; }
+.btn-outline { border: 2px solid #ddd; background: transparent; color: #555; }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-block { display: flex; width: 100%; box-sizing: border-box; }
+.btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+
+/* --- FORMULÁRIOS --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group { margin-bottom: 15px; }
+.full-width { grid-column: span 2; }
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.2);
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    justify-content: center;
+}
+
+/* --- TABELAS --- */
+.table-responsive { overflow-x: auto; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead { background-color: var(--primary); color: white; }
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover { background-color: #f1f1f1; }
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.status-ok { background: #d4edda; color: #155724; }
+.status-bad { background: #f8d7da; color: #721c24; }
+
+/* --- DASHBOARD CARDS --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px solid #eee;
+    transition: transform 0.3s;
+}
+
+.card:hover { transform: translateY(-5px); border-color: var(--accent); }
+.card h3 { color: var(--primary); margin-bottom: 15px; }
+.card i { font-size: 3rem; color: var(--accent); margin-bottom: 20px; }
+
+/* --- UTILITÁRIOS --- */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.search-bar { display: flex; gap: 10px; flex: 1; max-width: 400px; }

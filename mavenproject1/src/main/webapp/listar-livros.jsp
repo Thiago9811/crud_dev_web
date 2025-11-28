@@ -1,70 +1,90 @@
-<%-- 
-    Document   : listar-livros
-    Created on : 25 de nov. de 2025, 20:26:59
-    Author     : Thiago
---%>
-
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Acervo de Livros</title>
-        <style>
-            body { font-family: sans-serif; padding: 20px; text-align: center; }
-            table { margin: 20px auto; border-collapse: collapse; width: 95%; font-size: 14px;}
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #007bff; color: white; }
-            tr:nth-child(even) { background-color: #f2f2f2; }
-            .disponivel { color: green; font-weight: bold; }
-            .indisponivel { color: red; font-weight: bold; }
-        </style>
-    </head>
-    <body>
-        <h1>Acervo da Biblioteca</h1>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Editora</th>
-                    <th>Ano</th>
-                    <th>Gênero</th>
-                    <th>ISBN</th>
-                    <th>Total</th>
-                    <th>Disp.</th> </tr>
-            </thead>
-            <tbody>
-                <th>Ações</th>
-                <c:forEach var="l" items="${listaDeLivros}">
-                    <tr>
-                        <td>${l.livroId}</td>
-                        <td>${l.titulo}</td>
-                        <td>${l.autor}</td>
-                        <td>${l.editora}</td>
-                        <td>${l.anoPublicacao}</td>
-                        <td>${l.genero}</td>
-                        <td>${l.isbn}</td>
-                        <td>${l.quantidadeTotal}</td>
-                        <td>${l.quantidadeDisponivel}</td>
+<head>
+    <title>Acervo | Biblioteca</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
 
-                        <td>
-                            <a href="EditarLivro?id=${l.livroId}">Editar</a>
-                            |
-                            <a href="ExcluirLivro?id=${l.livroId}" onclick="return confirm('Tem certeza que deseja excluir este livro?');" style="color:red;">Excluir</a>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
+    <nav class="navbar">
+        <a href="dashboard.jsp" class="logo"><i class="fas fa-book-open"></i> Biblioteca</a>
+        <div class="nav-links">
+            <a href="dashboard.jsp">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 1200px;">
+        <div class="top-actions">
+            <div>
+                <h1 style="margin:0; color: var(--primary);">Acervo de Livros</h1>
+                <p style="margin:0; color: #666;">Gerencie o catálogo da biblioteca</p>
+            </div>
+            <form action="CadastroLivroController" method="get">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Novo Livro
+                </button>
+            </form>
+        </div>
         
-        <br>
-        <form action="CadastroLivroController" method="get">
-            <button type="submit" style="background-color: blue; color: white; padding: 10px; cursor: pointer;">Cadastrar Novo Livro</button>
-        </form>
-        <br>
-        <a href="dashboard.jsp">Voltar ao Menu Principal</a>
-    </body>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Autor / Editora</th>
+                        <th>Ano</th>
+                        <th>ISBN / Gênero</th>
+                        <th style="text-align: center;">Estoque</th>
+                        <th style="text-align: right;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="l" items="${listaDeLivros}">
+                        <tr>
+                            <td>#${l.livroId}</td>
+                            <td>
+                                <strong>${l.titulo}</strong>
+                            </td>
+                            <td>
+                                ${l.autor}<br>
+                                <small style="color:#777">${l.editora}</small>
+                            </td>
+                            <td>${l.anoPublicacao}</td>
+                            <td>
+                                ${l.isbn}<br>
+                                <small class="status-badge" style="background: #eee; color: #555;">${l.genero}</small>
+                            </td>
+                            <td style="text-align: center;">
+                                <div style="font-weight: bold;">${l.quantidadeDisponivel} / ${l.quantidadeTotal}</div>
+                                <c:if test="${l.quantidadeDisponivel == 0}">
+                                    <span class="status-badge status-bad">Esgotado</span>
+                                </c:if>
+                            </td>
+
+                            <td style="text-align: right;">
+                                <a href="EditarLivro?id=${l.livroId}" class="btn btn-outline btn-sm" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="ExcluirLivro?id=${l.livroId}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Tem certeza que deseja excluir este livro?');"
+                                   title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="dashboard.jsp" class="btn btn-outline">Voltar ao Painel</a>
+        </div>
+    </div>
+</body>
 </html>

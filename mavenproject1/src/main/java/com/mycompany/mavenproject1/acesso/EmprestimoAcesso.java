@@ -5,149 +5,278 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
 
 public class EmprestimoAcesso {
 
-    // Método auxiliar para conectar
     private Connection getConnection() throws Exception {
         Class.forName("org.apache.derby.jdbc.ClientDriver");
         return DriverManager.getConnection("jdbc:derby://localhost:1527/Biblioteca", "root", "root");
     }
 
-    // --- 1. REALIZAR EMPRÉSTIMO ---
+    public int buscarIdUsuarioPorNome(String nome) throws Exception {
+        int id = -1;
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT usuarioid FROM usuarios WHERE LOWER(nome) = LOWER(?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, nome.trim());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        id = rs.getInt("usuarioid");
+                    }
+                }
+            }
+        }
+        return id;
+    }
+
+    public int buscarIdLivroPorTitulo(String titulo) throws Exception {
+        int id = -1;
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT livroid FROM livros WHERE LOWER(titulo) = LOWER(?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, titulo.trim());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        id = rs.getInt("livroid");
+                    }
+                }
+            }
+        }
+        return id;
+    }
+
+    public List<String> listarNomesUsuarios() throws Exception {
+        List<String> lista = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT nome FROM usuarios ORDER BY nome";
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rs.getString("nome"));
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<String> listarTitulosLivrosDisponiveis() throws Exception {
+        List<String> lista = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT titulo FROM livros WHERE quantidadedisponivel > 0 ORDER BY titulo";
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(rs.getString("titulo"));
+                }
+            }
+        }
+        return lista;
+    }
+
     public void registrarEmprestimo(int usuarioId, int livroId) throws Exception {
-        Connection conn = getConnection();
-        
-        try {
-            // A. Verificar Estoque
+        try (Connection conn = getConnection()) {
             String sqlCheck = "SELECT quantidadedisponivel FROM livros WHERE livroid = ?";
-            PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck);
-            stmtCheck.setInt(1, livroId);
-            ResultSet rs = stmtCheck.executeQuery();
-            
-            if(rs.next()) {
-                if(rs.getInt("quantidadedisponivel") <= 0) {
-                    throw new Exception("Livro sem estoque disponível!");
+            try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
+                stmtCheck.setInt(1, livroId);
+                try (ResultSet rs = stmtCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt("quantidadedisponivel") <= 0) {
+                        throw new Exception("Livro sem estoque disponível!");
+                    }
                 }
             }
 
-            // B. Inserir Empréstimo (Data Prevista = Hoje + 7 dias)
-            String sqlInsert = "INSERT INTO emprestimos (usuarioid, livroid, dataemprestimo, datadevolucaoprevista, statusemprestimo) "
-                             + "VALUES (?, ?, CURRENT_DATE, ?, 'ativo')";
-            
-            PreparedStatement stmt = conn.prepareStatement(sqlInsert);
-            stmt.setInt(1, usuarioId);
-            stmt.setInt(2, livroId);
-            
-            // Cálculo da data: Hoje + 7 dias
-            java.time.LocalDate hoje = java.time.LocalDate.now();
-            stmt.setDate(3, Date.valueOf(hoje.plusDays(7))); 
-            
-            stmt.executeUpdate();
-            
-            // C. Baixar Estoque (-1)
+            String sqlInsert = "INSERT INTO emprestimos "
+                    + "(usuarioid, livroid, dataemprestimo, datadevolucaoprevista, statusemprestimo) "
+                    + "VALUES (?, ?, CURRENT_DATE, ?, 'ativo')";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlInsert)) {
+                stmt.setInt(1, usuarioId);
+                stmt.setInt(2, livroId);
+                stmt.setDate(3, Date.valueOf(java.time.LocalDate.now().plusDays(7)));
+                stmt.executeUpdate();
+            }
+
             String sqlEstoque = "UPDATE livros SET quantidadedisponivel = quantidadedisponivel - 1 WHERE livroid = ?";
-            PreparedStatement stmtEst = conn.prepareStatement(sqlEstoque);
-            stmtEst.setInt(1, livroId);
-            stmtEst.executeUpdate();
-            
-        } finally {
-            conn.close();
+            try (PreparedStatement stmtEst = conn.prepareStatement(sqlEstoque)) {
+                stmtEst.setInt(1, livroId);
+                stmtEst.executeUpdate();
+            }
         }
     }
 
-    // --- 2. REALIZAR DEVOLUÇÃO (COM MULTA) ---
     public String realizarDevolucao(int emprestimoId) throws Exception {
-        Connection conn = getConnection();
         String mensagem = "Devolução realizada com sucesso.";
-        
-        try {
-            // A. Buscar dados para checar atraso
+
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+
+            int usuarioId, livroId;
+            Date dataPrevista, dataHoje = new Date(System.currentTimeMillis());
+
             String sqlBusca = "SELECT usuarioid, livroid, datadevolucaoprevista FROM emprestimos WHERE emprestimoid = ?";
-            PreparedStatement stmtBusca = conn.prepareStatement(sqlBusca);
-            stmtBusca.setInt(1, emprestimoId);
-            ResultSet rs = stmtBusca.executeQuery();
-            
-            if(rs.next()) {
-                int usuarioId = rs.getInt("usuarioid");
-                int livroId = rs.getInt("livroid");
-                Date dataPrevista = rs.getDate("datadevolucaoprevista");
-                Date dataHoje = new Date(System.currentTimeMillis());
-                
-                // B. Atualizar Empréstimo (Fechar)
-                String sqlUpdate = "UPDATE emprestimos SET datadevolucaoreal = CURRENT_DATE, statusemprestimo = 'devolvido' WHERE emprestimoid = ?";
-                PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate);
-                stmtUpdate.setInt(1, emprestimoId);
-                stmtUpdate.executeUpdate();
-                
-                // C. Devolver Estoque (+1)
-                String sqlEstoque = "UPDATE livros SET quantidadedisponivel = quantidadedisponivel + 1 WHERE livroid = ?";
-                PreparedStatement stmtEst = conn.prepareStatement(sqlEstoque);
-                stmtEst.setInt(1, livroId);
-                stmtEst.executeUpdate();
-                
-                // D. Lógica de Penalidade
-                if (dataHoje.after(dataPrevista)) {
-                    long diff = dataHoje.getTime() - dataPrevista.getTime();
-                    long diasAtraso = java.util.concurrent.TimeUnit.DAYS.convert(diff, java.util.concurrent.TimeUnit.MILLISECONDS);
-                    
-                    // Multa de R$ 2.50 por dia
-                    double valorMulta = diasAtraso * 2.50;
-                    
-                    String sqlMulta = "INSERT INTO penalidades (usuarioid, emprestimoid, tipopenalidade, descricao, valormulta, diasuspensao, statuspenalidade, datapenalidade) "
-                                    + "VALUES (?, ?, 'multa', ?, ?, 0, 'pendente', CURRENT_DATE)";
-                    
-                    PreparedStatement stmtMulta = conn.prepareStatement(sqlMulta);
-                    stmtMulta.setInt(1, usuarioId);
-                    stmtMulta.setInt(2, emprestimoId);
-                    stmtMulta.setString(3, "Atraso de " + diasAtraso + " dias.");
-                    stmtMulta.setDouble(4, valorMulta); // Use setBigDecimal se mudou o tipo no banco
-                    stmtMulta.executeUpdate();
-                    
-                    mensagem = "Devolução com ATRASO! Multa gerada de R$ " + valorMulta;
+            try (PreparedStatement stmtBusca = conn.prepareStatement(sqlBusca)) {
+                stmtBusca.setInt(1, emprestimoId);
+                try (ResultSet rs = stmtBusca.executeQuery()) {
+                    if (!rs.next()) {
+                        conn.rollback();
+                        return "Empréstimo não encontrado.";
+                    }
+                    usuarioId = rs.getInt("usuarioid");
+                    livroId = rs.getInt("livroid");
+                    dataPrevista = rs.getDate("datadevolucaoprevista");
                 }
             }
-        } finally {
-            conn.close();
+
+            boolean houveAtraso = dataHoje.after(dataPrevista);
+            BigDecimal valorMulta = BigDecimal.ZERO;
+            if (houveAtraso) {
+                long diasAtraso = TimeUnit.DAYS.convert(dataHoje.getTime() - dataPrevista.getTime(), TimeUnit.MILLISECONDS);
+                valorMulta = BigDecimal.valueOf(diasAtraso);
+
+                String sqlPen = "INSERT INTO penalidades "
+                        + "(usuarioid, emprestimoid, tipopenalidade, descricao, valormulta, diassuspensao, statuspenalidade, datapenalidade) "
+                        + "VALUES (?, ?, 'atraso', ?, ?, 0, 'pendente', CURRENT_DATE)";
+
+                try (PreparedStatement stmtPen = conn.prepareStatement(sqlPen)) {
+                    stmtPen.setInt(1, usuarioId);
+                    stmtPen.setInt(2, emprestimoId);
+                    stmtPen.setString(3, "Atraso de " + valorMulta + " dias.");
+                    stmtPen.setBigDecimal(4, valorMulta);
+                    stmtPen.executeUpdate();
+                }
+
+                mensagem = "Devolução realizada com ATRASO! Multa gerada de R$ " + valorMulta;
+            }
+
+            String status = houveAtraso ? "atrasado" : "devolvido";
+            String sqlUpdate = "UPDATE emprestimos SET datadevolucaoreal = ?, statusemprestimo = ? WHERE emprestimoid = ?";
+            try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+                stmtUpdate.setDate(1, dataHoje);
+                stmtUpdate.setString(2, status);
+                stmtUpdate.setInt(3, emprestimoId);
+                stmtUpdate.executeUpdate();
+            }
+
+            String sqlEstoque = "UPDATE livros SET quantidadedisponivel = quantidadedisponivel + 1 WHERE livroid = ?";
+            try (PreparedStatement stmtEst = conn.prepareStatement(sqlEstoque)) {
+                stmtEst.setInt(1, livroId);
+                stmtEst.executeUpdate();
+            }
+
+            conn.commit();
         }
         return mensagem;
     }
-    
-    // --- 3. LISTAR HISTÓRICO ---
+
     public List<Emprestimo> listarHistorico() throws Exception {
         List<Emprestimo> lista = new ArrayList<>();
-        Connection conn = getConnection();
-        
-        // JOIN para trazer o Nome do Usuário e Título do Livro
-        String sql = "SELECT E.*, U.nome, L.titulo " +
-                     "FROM emprestimos E " +
-                     "JOIN usuarios U ON E.usuarioid = U.usuarioid " +
-                     "JOIN livros L ON E.livroid = L.livroid " +
-                     "ORDER BY E.dataemprestimo DESC";
-                     
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
-        
-        while(rs.next()) {
-            Emprestimo emp = new Emprestimo();
-            // Dados da tabela Emprestimo
-            emp.setEmprestimoId(rs.getInt("emprestimoid"));
-            emp.setDataEmprestimo(rs.getDate("dataemprestimo"));
-            emp.setDataDevolucaoPrevista(rs.getDate("datadevolucaoprevista"));
-            emp.setDataDevolucaoReal(rs.getDate("datadevolucaoreal"));
-            emp.setStatusEmprestimo(rs.getString("statusemprestimo"));
-            
-            // Dados das outras tabelas (JOIN)
-            emp.setNomeUsuarioAux(rs.getString("nome"));
-            emp.setTituloLivroAux(rs.getString("titulo"));
-            
-            lista.add(emp);
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT E.*, U.nome AS usuario_nome, L.titulo AS livro_titulo "
+                    + "FROM emprestimos E "
+                    + "JOIN usuarios U ON E.usuarioid = U.usuarioid "
+                    + "JOIN livros L ON E.livroid = L.livroid "
+                    + "ORDER BY E.dataemprestimo DESC";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Emprestimo emp = new Emprestimo();
+                    emp.setEmprestimoId(rs.getInt("emprestimoid"));
+                    emp.setUsuarioId(rs.getInt("usuarioid"));
+                    emp.setLivroId(rs.getInt("livroid"));
+                    emp.setDataEmprestimo(rs.getDate("dataemprestimo"));
+                    emp.setDataDevolucaoPrevista(rs.getDate("datadevolucaoprevista"));
+                    emp.setDataDevolucaoReal(rs.getDate("datadevolucaoreal"));
+                    emp.setStatusEmprestimo(rs.getString("statusemprestimo"));
+                    emp.setNomeUsuarioAux(rs.getString("usuario_nome"));
+                    emp.setTituloLivroAux(rs.getString("livro_titulo"));
+                    lista.add(emp);
+                }
+            }
         }
-        conn.close();
+        return lista;
+    }
+
+    public List<Map<String, Object>> gerarRelatorioEmprestimosPorUsuario() throws Exception {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT U.NOME AS USUARIO, " +
+                         "       COUNT(E.EMPRESTIMOID) AS TOTAL_EMPRESTIMOS, " +
+                         "       SUM(CASE WHEN E.STATUSEMPRESTIMO='atrasado' THEN 1 ELSE 0 END) AS ATRASADOS " +
+                         "FROM usuarios U " +
+                         "LEFT JOIN emprestimos E ON U.USUARIOID = E.USUARIOID " +
+                         "GROUP BY U.NOME " +
+                         "ORDER BY U.NOME";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> linha = new HashMap<>();
+                    linha.put("usuario", rs.getString("USUARIO"));
+                    linha.put("totalEmprestimos", rs.getInt("TOTAL_EMPRESTIMOS"));
+                    linha.put("atrasados", rs.getInt("ATRASADOS"));
+                    lista.add(linha);
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<Map<String, Object>> gerarRelatorioPenalidades() throws Exception {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT P.PENALIDADEID, U.NOME AS USUARIO, E.EMPRESTIMOID, " +
+                         "       P.TIPOPENALIDADE, P.VALORMULTA, P.STATUSPENALIDADE, P.DATAPENALIDADE " +
+                         "FROM penalidades P " +
+                         "LEFT JOIN usuarios U ON P.USUARIOID = U.USUARIOID " +
+                         "LEFT JOIN emprestimos E ON P.EMPRESTIMOID = E.EMPRESTIMOID " +
+                         "ORDER BY P.DATAPENALIDADE DESC";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> linha = new HashMap<>();
+                    linha.put("penalidadeId", rs.getInt("PENALIDADEID"));
+                    linha.put("usuario", rs.getString("USUARIO") != null ? rs.getString("USUARIO") : "N/A");
+                    linha.put("emprestimoId", rs.getInt("EMPRESTIMOID"));
+                    linha.put("tipo", rs.getString("TIPOPENALIDADE"));
+                    linha.put("valor", rs.getBigDecimal("VALORMULTA"));
+                    linha.put("status", rs.getString("STATUSPENALIDADE"));
+                    linha.put("data", rs.getDate("DATAPENALIDADE"));
+                    lista.add(linha);
+                }
+            }
+        }
+        return lista;
+    }
+
+    public List<Map<String, Object>> gerarRelatorioEstoque() throws Exception {
+        List<Map<String, Object>> lista = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT LIVROID, TITULO, QUANTIDADETOTAL, QUANTIDADEDISPONIVEL, " +
+                         "(QUANTIDADETOTAL - QUANTIDADEDISPONIVEL) AS EMPRESTADOS " +
+                         "FROM livros " +
+                         "ORDER BY EMPRESTADOS DESC";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> linha = new HashMap<>();
+                    linha.put("livroId", rs.getInt("LIVROID"));
+                    linha.put("titulo", rs.getString("TITULO"));
+                    linha.put("total", rs.getInt("QUANTIDADETOTAL"));
+                    linha.put("disponivel", rs.getInt("QUANTIDADEDISPONIVEL"));
+                    linha.put("emprestados", rs.getInt("EMPRESTADOS"));
+                    lista.add(linha);
+                }
+            }
+        }
         return lista;
     }
 }

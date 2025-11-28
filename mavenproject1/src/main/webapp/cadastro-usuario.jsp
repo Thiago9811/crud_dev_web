@@ -1,36 +1,64 @@
-<%-- 
-    Document   : cadastro-usuario
-    Created on : 25 de nov. de 2025, 23:38:20
-    Author     : Thiago
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Novo Cadastro</title>
-        <style>/* Seus estilos CSS aqui */</style>
-    </head>
-    <body>
-        <h1>Cadastro de Usuário</h1>
+<head>
+    <title>Novo Usuário | Biblioteca</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container container-small">
+        <div class="page-header">
+            <h1><i class="fas fa-user-plus"></i> Cadastro</h1>
+            <p>Preencha os dados abaixo</p>
+        </div>
         
         <form action="CadastroUsuario" method="post">
-            <label>Nome:</label> <input type="text" name="nome" required><br>
-            <label>Email:</label> <input type="email" name="email" required><br>
-            <label>Telefone:</label> <input type="text" name="telefone" required><br>
-            <label>CPF:</label> <input type="text" name="cpf" required><br>
-            <label>Senha:</label> <input type="password" name="senha" required><br>
-            
-            <div class="radio-group">
-                <input type="radio" id="membro" name="tipoUsuario" value="membro" checked>
-                <label for="membro">Leitor</label>
-                <input type="radio" id="admin" name="tipoUsuario" value="admin">
-                <label for="admin">Admin</label>
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" name="nome" required>
             </div>
             
-            <button type="submit">Salvar</button>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" name="telefone" required>
+                </div>
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" name="cpf" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" name="senha" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Tipo de Perfil</label>
+                <div class="radio-group">
+                    <label style="margin:0; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="tipoUsuario" value="membro" checked> Leitor
+                    </label>
+                    <label style="margin:0; font-weight:normal; cursor:pointer;">
+                        <input type="radio" name="tipoUsuario" value="admin"> Admin
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-block">Cadastrar</button>
         </form>
         
-        <a href="dashboard.jsp">Voltar</a>
-    </body>
+        <div style="margin-top: 15px; text-align: center;">
+            <a href="dashboard.jsp" class="btn btn-outline">Voltar</a>
+        </div>
+    </div>
+</body>
 </html>

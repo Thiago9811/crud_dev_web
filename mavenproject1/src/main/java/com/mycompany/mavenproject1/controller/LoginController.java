@@ -25,7 +25,7 @@ public class LoginController extends HttpServlet {
         } else {
             // ERRO
             request.setAttribute("erro", "Dados inválidos!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
         }
     }
     
